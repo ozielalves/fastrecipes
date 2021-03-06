@@ -1,2 +1,16 @@
 # fastrecipes
-O FastRecipe é um aplicativo que tem o objetivo de fornecer receitas adequadas aos suprimentos que os seus usuários têm em casa e também visa reaproveitar sobras de comida com ideias de pratos fáceis e acessíveis. Por meio de uma simples busca dos ingredientes que constam na geladeira ou despensa, o app retorna as receitas que o usuário poderá fazer sem precisar se locomover para o supermercado para a compra de novos itens, como também apresenta opções de substituição de ingredientes. As receitas serão cadastradas pelos próprios usuários do FastRecipe.
+
+A new Flutter project.
+
+## Getting Started
+
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+
+For help getting started with Flutter, view our
+[online documentation](https://flutter.dev/docs), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

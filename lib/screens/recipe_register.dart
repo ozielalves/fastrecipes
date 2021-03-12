@@ -1,6 +1,5 @@
 import 'package:fastrecipes/models/recipe.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fastrecipes/widgets/widgets.dart';
 
 class RecipeRegister extends StatefulWidget {
@@ -10,8 +9,8 @@ class RecipeRegister extends StatefulWidget {
 
 class _RecipeRegisterState extends State<RecipeRegister> {
   List<Igredient> igredients = [
-    Igredient(1, Food(1, 'Feijão preto'), Food(2, 'Feijão verde')),
-    Igredient(2, Food(3, 'Arroz'), Food(4, 'Macarrão')),
+    Igredient(1, Food(1, 'Feijão preto'), null),
+    Igredient(2, Food(3, 'Arroz'), null),
     Igredient(3, Food(5, 'Carne'), Food(6, 'Frango')),
     Igredient(4, Food(7, 'Acabate'), Food(8, 'Morango')),
     Igredient(5, Food(9, 'Cebola'), Food(10, 'Tomate')),
@@ -108,7 +107,10 @@ class _RecipeRegisterState extends State<RecipeRegister> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            Text('${i.food.name} - ${i.foodSubstitute.name}',
+                            Text(
+                                i.foodSubstitute != null
+                                    ? '${i.food.name} - ${i.foodSubstitute.name}'
+                                    : '${i.food.name}',
                                 style: TextStyle(
                                     fontSize: 16.0,
                                     fontWeight: FontWeight.w700,
@@ -132,18 +134,52 @@ class _RecipeRegisterState extends State<RecipeRegister> {
                 ),
               ),
               Container(
-                height: 83,
-                width: 374,
+                padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
                 margin: EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: kElevationToShadow[4],
                 ),
-                child: null,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: 'Feijão',
+                        decoration: InputDecoration(
+                          focusColor: Color(0xFF7B7B7B),
+                          labelText: 'Ingrediente',
+                          errorText: 'Error message',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          suffixIcon: Icon(
+                            Icons.error,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 30),
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: 'Feijão',
+                        decoration: InputDecoration(
+                          focusColor: Color(0xFF7B7B7B),
+                          labelText: 'Ingrediente',
+                          errorText: 'Error message',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          suffixIcon: Icon(
+                            Icons.error,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+                margin: EdgeInsets.only(right: 20, left: 20, top: 13),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -161,6 +197,7 @@ class _RecipeRegisterState extends State<RecipeRegister> {
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Modo de preparo',
                         style: TextStyle(
@@ -168,10 +205,61 @@ class _RecipeRegisterState extends State<RecipeRegister> {
                             fontWeight: FontWeight.w400,
                             fontStyle: FontStyle.normal,
                             color: Color(0xFF333333))),
+                    Container(
+                      margin: EdgeInsets.only(top: 20),
+                      child: Flexible(
+                        child: TextFormField(
+                          maxLines: 8,
+                          initialValue: 'Preparo da receita',
+                          decoration: InputDecoration(
+                            focusColor: Color(0xFF7B7B7B),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-              // TEXT AREA
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: 'Exemplo',
+                        decoration: InputDecoration(
+                          focusColor: Color(0xFF7B7B7B),
+                          labelText: 'Tempo',
+                          errorText: 'Error message',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          suffixIcon: Icon(
+                            Icons.error,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 30),
+                    Flexible(
+                      child: TextFormField(
+                        initialValue: 'Exemplo',
+                        decoration: InputDecoration(
+                          focusColor: Color(0xFF7B7B7B),
+                          labelText: 'Dificuldade',
+                          errorText: 'Error message',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          suffixIcon: Icon(
+                            Icons.error,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
                 child: Row(
@@ -186,7 +274,7 @@ class _RecipeRegisterState extends State<RecipeRegister> {
                         }),
                   ],
                 ),
-              ),
+              )
             ],
           ),
         ),

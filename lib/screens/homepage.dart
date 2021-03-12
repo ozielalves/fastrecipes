@@ -33,7 +33,7 @@ class HomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Container(
-                      margin: EdgeInsets.fromLTRB(57.0, 62.0, 33.0, 38.0),
+                      margin: EdgeInsets.fromLTRB(46.0, 62.0, 33.0, 38.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -71,7 +71,7 @@ class HomePage extends StatelessWidget {
                     ),
                     Container(
                       margin: EdgeInsets.only(
-                        left: 30.0,
+                        left: 25.0,
                       ),
                       child: SvgPicture.asset(
                         'assets/images/people_having_fun.svg',
@@ -80,7 +80,7 @@ class HomePage extends StatelessWidget {
                     Expanded(
                         child: Container(
                       alignment: Alignment.bottomCenter,
-                      margin: EdgeInsets.fromLTRB(57.0, 0, 33.0, 62.0),
+                      margin: EdgeInsets.fromLTRB(46.0, 0, 33.0, 62.0),
                       child: ActionButton(
                           text: 'Quero começar',
                           textColor: Colors.white,

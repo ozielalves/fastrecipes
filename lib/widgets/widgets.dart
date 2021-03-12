@@ -1,4 +1,4 @@
-/* import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class TaskCardWidget extends StatelessWidget {
@@ -48,6 +48,43 @@ class TaskCardWidget extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+}
+
+class ActionButton extends StatelessWidget {
+  final String text;
+  final Color textColor;
+  final Color buttonColor;
+  final Function action;
+  final bool outlined;
+
+  ActionButton({
+    this.text,
+    this.textColor,
+    this.buttonColor,
+    this.action,
+    this.outlined = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return RawMaterialButton(
+      onPressed: action,
+      elevation: outlined ? 0 : 2.0,
+      fillColor: outlined ? Colors.transparent : buttonColor,
+      child: Text(text,
+          style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.w700,
+              fontStyle: FontStyle.normal,
+              color: textColor)),
+      padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+          side: BorderSide(
+              width: 2, color: outlined ? buttonColor : Colors.transparent)),
+      constraints: BoxConstraints(minWidth: 0),
     );
   }
 }
@@ -180,4 +217,3 @@ class NoGlowBehaviour extends ScrollBehavior {
     return child;
   }
 }
- */

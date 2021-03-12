@@ -37,7 +37,6 @@ class Recipe {
         Stock(s["symbol"], s["companyName"], s["price"], s["changePercent"]))
     .toList(growable: false); */
 
-
 /* final List<Map<String, Object>> _stocks = [
   {
     "symbol": "BIAS",

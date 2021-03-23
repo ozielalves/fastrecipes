@@ -4,6 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fastrecipes/widgets/widgets.dart';
 import 'package:flutter/services.dart';
 
+import 'recipes.dart';
+
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -87,7 +89,7 @@ class HomePage extends StatelessWidget {
                           buttonColor: Theme.of(context).primaryColor,
                           action: () {
                             Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => RecipeRegister()));
+                                builder: (context) => Recipes()));
                           }),
                     ))
                   ],

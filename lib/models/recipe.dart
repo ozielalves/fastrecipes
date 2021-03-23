@@ -1,65 +1,91 @@
+import 'dart:convert';
+
+Food foodFromJson(String str) => Food.fromJson(json.decode(str));
+
+String foodToJson(Food data) => json.encode(data.toJson());
+
 class Food {
-  int _id;
+  Food({
+    this.id,
+    this.name,
+  });
+
+  int id;
   String name;
 
-  Food(this._id, this.name);
-}
+  factory Food.fromJson(Map<String, dynamic> json) => Food(
+        id: json["id"],
+        name: json["name"],
+      );
 
-class Igredient {
-  int _id;
-  Food food;
-  Food foodSubstitute;
-
-  Igredient(this._id, this.food, this.foodSubstitute);
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+      };
 }
+// To parse this JSON data, do
+//
+//     final recipe = recipeFromJson(jsonString);
+
+Recipe recipeFromJson(String str) => Recipe.fromJson(json.decode(str));
+
+String recipeToJson(Recipe data) => json.encode(data.toJson());
 
 class Recipe {
-  int _id;
-  String userName;
+  Recipe({
+    this.creatorName,
+    this.name,
+    this.preparationTime,
+    this.preparation,
+    this.dificultyLevel,
+    this.ingredients,
+  });
+
+  String creatorName;
   String name;
-  List<Igredient> igredients; // mandar lista de ids de igrediente?
-  String preparation;
   int preparationTime;
-  String dificultyLevel;
+  String preparation;
+  int dificultyLevel;
+  List<Ingredient> ingredients;
 
-  Recipe(this._id, this.userName, this.name, this.igredients, this.preparation,
-      this.preparationTime, this.dificultyLevel);
+  factory Recipe.fromJson(Map<String, dynamic> json) => Recipe(
+        creatorName: json["creatorName"],
+        name: json["name"],
+        preparationTime: json["preparationTime"],
+        preparation: json["preparation"],
+        dificultyLevel: json["dificultyLevel"],
+        ingredients: List<Ingredient>.from(
+            json["ingredients"].map((x) => Ingredient.fromJson(x))),
+      );
 
-  @override
-  toString() =>
-      "Recipe: {id: $_id, userName: $userName, name: $name, igredients: $igredients, preparation: $preparation, preparationTime: $preparation, dificultyLevel: $dificultyLevel}";
+  Map<String, dynamic> toJson() => {
+        "creatorName": creatorName,
+        "name": name,
+        "preparationTime": preparationTime,
+        "preparation": preparation,
+        "dificultyLevel": dificultyLevel,
+        "ingredients": List<dynamic>.from(ingredients.map((x) => x.toJson())),
+      };
 }
 
-// http://localhost:4101/recipe
+enum DificultyLevels { facil, medio, dificil }
 
-/* final List<Recipe> recipes = _stocks
-    .map((s) =>
-        Stock(s["symbol"], s["companyName"], s["price"], s["changePercent"]))
-    .toList(growable: false); */
+class Ingredient {
+  Ingredient({
+    this.food,
+    this.substituteFood,
+  });
 
-/* final List<Map<String, Object>> _stocks = [
-  {
-    "symbol": "BIAS",
-    "companyName": "Boticario Intancia Análise Saudável",
-    "price": "7.90",
-    "changePercent": "3.0"
-  },
-  {
-    "symbol": "BIAS",
-    "companyName": "Boticario Intancia Análise Saudável",
-    "price": "7.90",
-    "changePercent": "3.0"
-  },
-  {
-    "symbol": "BIAS",
-    "companyName": "Boticario Intancia Análise Saudável",
-    "price": "7.90",
-    "changePercent": "3.0"
-  },
-  {
-    "symbol": "BIAS",
-    "companyName": "Boticario Intancia Análise Saudável",
-    "price": "7.90",
-    "changePercent": "3.0"
-  },
-]; */
+  String food;
+  String substituteFood;
+
+  factory Ingredient.fromJson(Map<String, dynamic> json) => Ingredient(
+        food: json["food"],
+        substituteFood: json["substituteFood"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "food": food,
+        "substituteFood": substituteFood,
+      };
+}

@@ -1,6 +1,7 @@
 import 'package:fastrecipes/models/recipe.dart';
 import 'package:flutter/material.dart';
 import 'package:fastrecipes/widgets/widgets.dart';
+import 'package:fastrecipes/helpers/api_manager.dart';
 
 class RecipeRegister extends StatefulWidget {
   @override
@@ -8,16 +9,65 @@ class RecipeRegister extends StatefulWidget {
 }
 
 class _RecipeRegisterState extends State<RecipeRegister> {
-  List<Igredient> igredients = [
-    Igredient(1, Food(1, 'Feijão preto'), null),
-    Igredient(2, Food(3, 'Arroz'), null),
-    Igredient(3, Food(5, 'Carne'), Food(6, 'Frango')),
-    Igredient(4, Food(7, 'Acabate'), Food(8, 'Morango')),
-    Igredient(5, Food(9, 'Cebola'), Food(10, 'Tomate')),
-    Igredient(6, Food(11, 'Espinafre'), Food(12, 'Uva')),
-    Igredient(7, Food(13, 'Ovo'), Food(14, 'Óleo')),
-    Igredient(8, Food(15, 'Banana'), Food(16, 'Maçã')),
-  ];
+  ApiManager apiManager = ApiManager();
+
+  List<Ingredient> ingredients = [];
+  Recipe recipe;
+
+  // Controllers
+  TextEditingController nameController = TextEditingController();
+  TextEditingController lastnameController = TextEditingController();
+  TextEditingController recipeNameController = TextEditingController();
+  TextEditingController foodController = TextEditingController();
+  TextEditingController substituteFoodController = TextEditingController();
+  TextEditingController preparationController = TextEditingController();
+  TextEditingController preparationTimeController = TextEditingController();
+  TextEditingController dificultyLevelController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    ingredients = [];
+  }
+
+  Future<void> _addIngredient() async {
+    if (foodController != null && foodController.text.length > 0) {
+      var ingredient = {};
+      ingredient["food"] = await apiManager.addFood(foodController.text);
+      if (substituteFoodController != null &&
+          substituteFoodController.text.length > 0) {
+        ingredient["substituteFood"] =
+            await apiManager.addFood(substituteFoodController.text);
+      }
+      if (ingredient != null) {
+        setState(() {
+          ingredients.insert(
+              0,
+              Ingredient(
+                  food: foodController.text,
+                  substituteFood: substituteFoodController.text.length > 0
+                      ? substituteFoodController.text
+                      : null));
+          foodController.clear();
+        });
+      }
+      foodController.clear();
+      substituteFoodController.clear();
+    }
+  }
+
+  void _createRecipe() {
+    setState(() {
+      recipe = new Recipe(
+          creatorName: '${nameController.text} ${lastnameController.text}',
+          name: recipeNameController.text,
+          ingredients: ingredients,
+          preparation: preparationController.text,
+          preparationTime: int.parse(preparationTimeController.text),
+          dificultyLevel: 1); // MODIFICAR
+      print(recipe);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,48 +75,22 @@ class _RecipeRegisterState extends State<RecipeRegister> {
       backgroundColor: Color(0xFFFFF3E0),
       body: SingleChildScrollView(
         child: Container(
-          margin: EdgeInsets.only(top: 54, bottom: 19),
+          margin: EdgeInsets.only(top: 54, bottom: 62),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    RawMaterialButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      elevation: 2.0,
-                      fillColor: Theme.of(context).primaryColor,
-                      child: Icon(
-                        Icons.arrow_back,
-                        size: 30.0,
-                        color: Colors.white,
-                      ),
-                      padding: EdgeInsets.all(7.0),
-                      shape: CircleBorder(),
-                      constraints: BoxConstraints(minWidth: 0),
-                    ),
-                    SizedBox(
-                      width: 50,
-                    ),
-                    Text('Nova Receita',
-                        style: TextStyle(
-                            fontSize: 30.0,
-                            fontWeight: FontWeight.w600,
-                            fontStyle: FontStyle.normal,
-                            color: Theme.of(context).primaryColor))
-                  ],
-                ),
-              ),
+                  margin: EdgeInsets.symmetric(horizontal: 19),
+                  child: PageHeader(
+                    title: 'Nova Receita',
+                  )),
               SizedBox(
                 height: 24.0,
               ),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: 19),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('Indentificação',
                         style: TextStyle(
@@ -74,11 +98,56 @@ class _RecipeRegisterState extends State<RecipeRegister> {
                             fontWeight: FontWeight.w400,
                             fontStyle: FontStyle.normal,
                             color: Color(0xFF333333))),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 20),
+                      child: Row(
+                        children: [
+                          Input(
+                            label: 'Nome',
+                            controller: nameController,
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Informe o nome';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(width: 30),
+                          Input(
+                            label: 'Sobrenome',
+                            controller: lastnameController,
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Informe o sobrenome';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(bottom: 20),
+                      child: Row(
+                        children: [
+                          Input(
+                            label: 'Nome da receita',
+                            controller: recipeNameController,
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Informe o nome da receita';
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: 19),
                 child: Column(
                   children: [
                     Text('Ingredientes',
@@ -94,48 +163,39 @@ class _RecipeRegisterState extends State<RecipeRegister> {
                 height: 28,
                 margin: EdgeInsets.symmetric(vertical: 18),
                 child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: <Widget>[
-                    for (var i in igredients)
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
-                          borderRadius: BorderRadius.all(Radius.circular(50)),
-                        ),
-                        padding: EdgeInsets.only(left: 14),
-                        margin: EdgeInsets.only(right: 9),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                                i.foodSubstitute != null
-                                    ? '${i.food.name} - ${i.foodSubstitute.name}'
-                                    : '${i.food.name}',
+                    scrollDirection: Axis.horizontal,
+                    children: ingredients != null && ingredients.length > 0
+                        ? <Widget>[
+                            for (var i in ingredients)
+                              FoodChip(
+                                food: i.food,
+                                substituteFood: i.substituteFood != null
+                                    ? i.substituteFood
+                                    : null,
+                                onRemove: () {
+                                  setState(() {
+                                    ingredients.remove(i);
+                                  });
+                                },
+                              ),
+                          ]
+                        : [
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: 19),
+                              child: Text(
+                                'Adcione ingredientes à receita...',
                                 style: TextStyle(
                                     fontSize: 16.0,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w400,
                                     fontStyle: FontStyle.normal,
-                                    color: Colors.white)),
-                            RawMaterialButton(
-                              onPressed: () {},
-                              child: Icon(
-                                Icons.close,
-                                size: 20,
-                                color: Colors.white,
+                                    color: Color(0xFFB2B2B2)),
                               ),
-                              /* padding: EdgeInsets.all(2.0), */
-                              shape: CircleBorder(),
-                              constraints: BoxConstraints(minWidth: 0),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
+                            )
+                          ]),
               ),
               Container(
                 padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                margin: EdgeInsets.symmetric(horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: 19),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
@@ -143,43 +203,27 @@ class _RecipeRegisterState extends State<RecipeRegister> {
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: 'Feijão',
-                        decoration: InputDecoration(
-                          focusColor: Color(0xFF7B7B7B),
-                          labelText: 'Ingrediente',
-                          errorText: 'Error message',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          suffixIcon: Icon(
-                            Icons.error,
-                          ),
-                        ),
-                      ),
+                  children: <Widget>[
+                    Input(
+                      label: 'Ingrediente',
+                      controller: foodController,
+                      /* onSubmit: (_) {
+                        _addIngredient();
+                      }, */
                     ),
                     SizedBox(width: 30),
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: 'Feijão',
-                        decoration: InputDecoration(
-                          focusColor: Color(0xFF7B7B7B),
-                          labelText: 'Ingrediente',
-                          errorText: 'Error message',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          suffixIcon: Icon(
-                            Icons.error,
-                          ),
-                        ),
-                      ),
+                    Input(
+                      label: 'Substituto',
+                      controller: substituteFoodController,
+                      /* onSubmit: (_) {
+                        _addIngredient();
+                      }, */
                     ),
                   ],
                 ),
               ),
               Container(
-                margin: EdgeInsets.only(right: 20, left: 20, top: 13),
+                margin: EdgeInsets.only(right: 19, left: 19, top: 13),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -187,15 +231,13 @@ class _RecipeRegisterState extends State<RecipeRegister> {
                         text: 'Adcionar',
                         textColor: Theme.of(context).primaryColor,
                         buttonColor: Theme.of(context).primaryColor,
-                        action: () {
-                          Navigator.of(context).pop();
-                        },
+                        action: _addIngredient,
                         outlined: true),
                   ],
                 ),
               ),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20),
+                margin: EdgeInsets.symmetric(horizontal: 19),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -207,71 +249,64 @@ class _RecipeRegisterState extends State<RecipeRegister> {
                             color: Color(0xFF333333))),
                     Container(
                       margin: EdgeInsets.only(top: 20),
-                      child: Flexible(
-                        child: TextFormField(
-                          maxLines: 8,
-                          initialValue: 'Preparo da receita',
-                          decoration: InputDecoration(
-                            focusColor: Color(0xFF7B7B7B),
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)),
+                      child: Row(
+                        children: [
+                          Input(
+                            maxLines: 8,
+                            controller: preparationController,
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return 'Informe o modo de preparo';
+                              }
+                              return null;
+                            },
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                margin: EdgeInsets.symmetric(horizontal: 19, vertical: 20),
                 child: Row(
                   children: [
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: 'Exemplo',
-                        decoration: InputDecoration(
-                          focusColor: Color(0xFF7B7B7B),
-                          labelText: 'Tempo',
-                          errorText: 'Error message',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          suffixIcon: Icon(
-                            Icons.error,
-                          ),
-                        ),
-                      ),
+                    Input(
+                      label: 'Tempo',
+                      controller: preparationTimeController,
+                      type: 'number',
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Informe o tempo de preparo';
+                        }
+                        return null;
+                      },
                     ),
                     SizedBox(width: 30),
-                    Flexible(
-                      child: TextFormField(
-                        initialValue: 'Exemplo',
-                        decoration: InputDecoration(
-                          focusColor: Color(0xFF7B7B7B),
-                          labelText: 'Dificuldade',
-                          errorText: 'Error message',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          suffixIcon: Icon(
-                            Icons.error,
-                          ),
-                        ),
-                      ),
+                    Input(
+                      label: 'Dificuldade',
+                      controller: dificultyLevelController,
+                      validator: (value) {
+                        if (value.isEmpty) {
+                          return 'Informe a dificuldade';
+                        }
+                        return null;
+                      },
                     ),
                   ],
                 ),
               ),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+                margin: EdgeInsets.fromLTRB(19, 13, 19, 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ActionButton(
-                        text: 'Cadastrar',
-                        textColor: Colors.white,
-                        buttonColor: Theme.of(context).primaryColor,
-                        action: () {
-                          Navigator.of(context).pop();
-                        }),
+                      text: 'Cadastrar',
+                      textColor: Colors.white,
+                      buttonColor: Theme.of(context).primaryColor,
+                      action: _createRecipe,
+                    )
                   ],
                 ),
               )

@@ -43,9 +43,9 @@ class Recipe {
 
   String creatorName;
   String name;
-  int preparationTime;
+  String preparationTime;
   String preparation;
-  int dificultyLevel;
+  String dificultyLevel;
   List<Ingredient> ingredients;
 
   factory Recipe.fromJson(Map<String, dynamic> json) => Recipe(
@@ -68,7 +68,13 @@ class Recipe {
       };
 }
 
-enum DificultyLevels { facil, medio, dificil }
+/* enum DificultyLevels { facil, medio, dificil } */
+
+const dificultyLevels = [
+  {"id": 1, "level": "Fácil"},
+  {"id": 2, "level": "Médio"},
+  {"id": 3, "level": "Difícil"},
+];
 
 class Ingredient {
   Ingredient({

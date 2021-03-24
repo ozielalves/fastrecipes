@@ -63,8 +63,8 @@ class _RecipeRegisterState extends State<RecipeRegister> {
           name: recipeNameController.text,
           ingredients: ingredients,
           preparation: preparationController.text,
-          preparationTime: int.parse(preparationTimeController.text),
-          dificultyLevel: 1); // MODIFICAR
+          preparationTime: preparationTimeController.text,
+          dificultyLevel: dificultyLevelController.text); // MODIFICAR
       print(recipe);
     });
   }

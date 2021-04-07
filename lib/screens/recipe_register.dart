@@ -1,7 +1,13 @@
 import 'package:fastrecipes/models/recipe.dart';
+import 'package:fastrecipes/screens/recipes.dart';
+import 'package:fastrecipes/widgets/action_button.dart';
+import 'package:fastrecipes/widgets/food_chip.dart';
+import 'package:fastrecipes/widgets/input.dart';
+import 'package:fastrecipes/widgets/page_header.dart';
+import 'package:fastrecipes/widgets/warning_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:fastrecipes/widgets/widgets.dart';
-import 'package:fastrecipes/helpers/api_manager.dart';
+/* import 'package:fastrecipes/helpers/api_manager.dart'; */
+import 'package:fastrecipes/provider/recipe.dart';
 
 class RecipeRegister extends StatefulWidget {
   @override
@@ -31,42 +37,72 @@ class _RecipeRegisterState extends State<RecipeRegister> {
   }
 
   Future<void> _addIngredient() async {
-    if (foodController != null && foodController.text.length > 0) {
+    /* if (foodController != null && foodController.text.length > 0) {
       var ingredient = {};
-      ingredient["food"] = await apiManager.addFood(foodController.text);
+      ingredient["foodId"] = await apiManager.addFood(foodController.text);
       if (substituteFoodController != null &&
           substituteFoodController.text.length > 0) {
-        ingredient["substituteFood"] =
+        ingredient["substituteFoodId"] =
             await apiManager.addFood(substituteFoodController.text);
       }
-      if (ingredient != null) {
-        setState(() {
-          ingredients.insert(
-              0,
-              Ingredient(
-                  food: foodController.text,
-                  substituteFood: substituteFoodController.text.length > 0
-                      ? substituteFoodController.text
-                      : null));
-          foodController.clear();
-        });
-      }
+      if (ingredient != null) { */
+    setState(() {
+      ingredients.insert(
+          0,
+          Ingredient(
+              food: foodController.text,
+              substituteFood: substituteFoodController.text.length > 0
+                  ? substituteFoodController.text
+                  : null));
       foodController.clear();
-      substituteFoodController.clear();
-    }
+    });
+    /* } */
+    foodController.clear();
+    substituteFoodController.clear();
+    /* } */
   }
 
-  void _createRecipe() {
-    setState(() {
-      recipe = new Recipe(
+  Future<void> _createRecipe() async {
+    if (nameController.text.length > 0 &&
+        lastnameController.text.length > 0 &&
+        recipeNameController.text.length > 0 &&
+        preparationController.text.length > 0 &&
+        preparationTimeController.text.length > 0 &&
+        dificultyLevelController.text.length > 0) {
+      var recipeId;
+      recipeId = await apiManager.addRecipe(new Recipe(
           creatorName: '${nameController.text} ${lastnameController.text}',
           name: recipeNameController.text,
           ingredients: ingredients,
           preparation: preparationController.text,
           preparationTime: preparationTimeController.text,
-          dificultyLevel: dificultyLevelController.text); // MODIFICAR
-      print(recipe);
-    });
+          dificultyLevel: dificultyLevelController.text));
+      if (recipeId == null) {
+        return;
+      }
+    }
+    nameController.clear();
+    lastnameController.clear();
+    recipeNameController.clear();
+    preparationController.clear();
+    preparationTimeController.clear();
+    dificultyLevelController.clear();
+
+    // SNACKBAR
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      backgroundColor: Colors.green,
+      behavior: SnackBarBehavior.floating,
+      content: Text('Receita cadastrada com sucesso!',
+          style: TextStyle(color: Colors.white)),
+      action: SnackBarAction(
+        label: 'Limpar',
+        textColor: Colors.white,
+        onPressed: () {},
+      ),
+    ));
+
+    return Navigator.of(context)
+        .push(MaterialPageRoute(builder: (context) => Recipes()));
   }
 
   @override
@@ -82,6 +118,24 @@ class _RecipeRegisterState extends State<RecipeRegister> {
               Container(
                   margin: EdgeInsets.symmetric(horizontal: 19),
                   child: PageHeader(
+                    onGoBack: () => showDialog(
+                        context: context,
+                        builder: (context) {
+                          return WarningDialog(
+                            title: "Abandonar o cadatro de receita?",
+                            content:
+                                "Todos os dados fornecidos serão perdidos.",
+                            primaryButtonText: "Confirmar",
+                            primaryButtonAction: () {
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                            secondaryButtonText: "Cancelar",
+                            secondaryButtonAction: () {
+                              Navigator.pop(context);
+                            },
+                          );
+                        }),
                     title: 'Nova Receita',
                   )),
               SizedBox(
@@ -207,17 +261,11 @@ class _RecipeRegisterState extends State<RecipeRegister> {
                     Input(
                       label: 'Ingrediente',
                       controller: foodController,
-                      /* onSubmit: (_) {
-                        _addIngredient();
-                      }, */
                     ),
                     SizedBox(width: 30),
                     Input(
                       label: 'Substituto',
                       controller: substituteFoodController,
-                      /* onSubmit: (_) {
-                        _addIngredient();
-                      }, */
                     ),
                   ],
                 ),

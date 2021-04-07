@@ -6,7 +6,7 @@ String foodToJson(Food data) => json.encode(data.toJson());
 
 class Food {
   Food({
-    this.id,
+    this.id,  
     this.name,
   });
 

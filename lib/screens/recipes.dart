@@ -1,8 +1,13 @@
-import 'package:fastrecipes/helpers/api_manager.dart';
+/* import 'package:fastrecipes/helpers/api_manager.dart'; */
 import 'package:fastrecipes/models/recipe.dart';
+import 'package:fastrecipes/widgets/action_button.dart';
+import 'package:fastrecipes/widgets/Input.dart';
+import 'package:fastrecipes/widgets/page_header.dart';
+import 'package:fastrecipes/widgets/recipe_card.dart';
+import 'package:fastrecipes/widgets/recipe_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:fastrecipes/widgets/widgets.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:fastrecipes/provider/recipe.dart';
 
 import 'recipe_register.dart';
 
@@ -17,6 +22,7 @@ class _RecipesState extends State<Recipes> {
   List<Recipe> recipes = [];
   List<Recipe> filteredRecipes = [];
   Recipe selectedRecipe;
+  bool isRecipesRequestLoading = false;
 
   // Search controller
   TextEditingController searchController = TextEditingController();
@@ -24,48 +30,24 @@ class _RecipesState extends State<Recipes> {
   @override
   void initState() {
     super.initState();
-    recipes = [
-      Recipe(
-        name: "Feijoada Vegana",
-        creatorName: "Gabrielle Duarte",
-        preparationTime: "90",
-        /* ingredients: [
-            Ingredient(food: "Feijão"),
-            Ingredient(food: "Cebola", substituteFood: "Alho"),
-            Ingredient(food: "Laranja", substituteFood: "Cenoura")
-          ], */
-        dificultyLevel: "Médio",
-      ),
-      Recipe(
-        name: "Brigadeiro",
-        creatorName: "Oziel Alves",
-        preparationTime: "20",
-        dificultyLevel: "Fácil",
-      ),
-      Recipe(
-        name: "Pipoca de Ninho",
-        creatorName: "Michel",
-        preparationTime: "10",
-        dificultyLevel: "Médio",
-      ),
-      Recipe(
-        name: "Sopa de Tomates",
-        creatorName: "André Stabile",
-        preparationTime: "30",
-        dificultyLevel: "Difícil",
-      ),
-    ];
-    filteredRecipes = recipes;
-    /* updateList(); */
+    _updateList();
   }
 
-  void updateList() {
-    apiManager.getRecipes().then((list) {
+  void _setRecipesRequestLoading(bool value) {
+    setState(() {
+      isRecipesRequestLoading = value;
+    });
+  }
+
+  Future<void> _updateList() async {
+    _setRecipesRequestLoading(true);
+    await apiManager.getRecipes().then((list) {
       setState(() {
         recipes = list;
         filteredRecipes = list;
       });
     });
+    _setRecipesRequestLoading(false);
   }
 
   void handdleSearch(String value) {
@@ -99,119 +81,159 @@ class _RecipesState extends State<Recipes> {
           ),
         ),
         body: Container(
-            /* padding: EdgeInsets.fromLTRB(19, 32, 19, 19), */
+            color: Colors.transparent,
             child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: kElevationToShadow[3],
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(50),
-                      bottomRight: Radius.circular(50))),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    margin: EdgeInsets.fromLTRB(19, 54, 19, 19),
-                    child: PageHeader(title: '   Receitas'),
-                  ),
-                  Container(
-                    margin: EdgeInsets.fromLTRB(19, 0, 19, 15),
-                    child: Row(
-                      children: [
-                        Input(
-                          controller: searchController,
-                          borderRadius: 50.0,
-                          label: 'O que tem na sua geladeira?',
-                          labelFontSize: 18,
-                          floatingLabelBehavior: FloatingLabelBehavior.never,
-                          icon: Icon(
-                            Icons.search,
-                            color: Theme.of(context).primaryColor,
-                            size: 30,
-                          ),
-                          onChanged: (text) {
-                            handdleSearch(text);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ScrollConfiguration(
-                behavior: NoGlowBehaviour(),
-                child: ListView(
-                  children: <Widget>[
-                    if (filteredRecipes != null &&
-                        filteredRecipes.length > 0 &&
-                        searchController.text.length <= 0)
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: kElevationToShadow[3],
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(50),
+                          bottomRight: Radius.circular(50))),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
                       Container(
-                          margin: EdgeInsets.fromLTRB(19, 19, 19, 0),
-                          alignment: Alignment.centerLeft,
-                          child: RichText(
-                              text: TextSpan(
-                                  style: TextStyle(
-                                      fontSize: 22, color: Color(0xFF333333)),
-                                  children: <TextSpan>[
-                                TextSpan(
-                                  text: 'Mais',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                TextSpan(text: ' recentes')
-                              ]))),
-                    if (filteredRecipes != null && filteredRecipes.length > 0)
-                      for (var recipe in filteredRecipes)
-                        RecipeCard(
-                          recipe: recipe,
-                          selected: selectedRecipe == recipe ? true : false,
-                          onSelected: () {
-                            setState(() {
-                              selectedRecipe = recipe;
-                            });
-                          },
-                        )
-                    else
+                        margin: EdgeInsets.fromLTRB(19, 54, 19, 19),
+                        child: PageHeader(
+                            onGoBack: () {
+                              Navigator.of(context).pop();
+                            },
+                            title: '   Receitas'),
+                      ),
                       Container(
-                        padding: EdgeInsets.all(30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                        margin: EdgeInsets.fromLTRB(19, 0, 19, 15),
+                        child: Row(
                           children: [
-                            Icon(
-                              Icons.list_alt,
-                              color: Color(0xFF7B7B7B),
-                              size: 80,
-                            ),
-                            SizedBox(height: 9),
-                            Text(
-                              "Nenhuma receita encontrada",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  color: Color(0xFF333333),
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(height: 9),
-                            Text(
-                              "Castre uma receita ou realize uma nova busca",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Color(0xFF969696),
+                            Input(
+                              controller: searchController,
+                              borderRadius: 50.0,
+                              label: 'O que tem na sua geladeira?',
+                              labelFontSize: 18,
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.never,
+                              icon: Icon(
+                                Icons.search,
+                                color: Theme.of(context).primaryColor,
+                                size: 30,
                               ),
-                            )
+                              onChanged: (text) {
+                                handdleSearch(text);
+                              },
+                            ),
                           ],
                         ),
-                      )
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          ],
-        )));
+                Expanded(
+                  child: isRecipesRequestLoading
+                      ? Center(
+                          child: CircularProgressIndicator(
+                            backgroundColor: Theme.of(context).primaryColor,
+                          ),
+                        )
+                      : ShaderMask(
+                          shaderCallback: (Rect rect) {
+                            return LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black,
+                                Colors.transparent,
+                                Colors.transparent,
+                                Colors.black
+                              ],
+                              stops: [
+                                0.0,
+                                0.05,
+                                1.0,
+                                1.0
+                              ], // 10% purple, 80% transparent, 10% purple
+                            ).createShader(rect);
+                          },
+                          blendMode: BlendMode.dstOut,
+                          child: ScrollConfiguration(
+                            behavior: NoGlowBehaviour(),
+                            child: ListView(
+                              children: <Widget>[
+                                if (filteredRecipes != null &&
+                                    filteredRecipes.length > 0 &&
+                                    searchController.text.length <= 0)
+                                  Container(
+                                      margin:
+                                          EdgeInsets.symmetric(horizontal: 19),
+                                      alignment: Alignment.centerLeft,
+                                      child: RichText(
+                                          text: TextSpan(
+                                              style: TextStyle(
+                                                  fontSize: 22,
+                                                  color: Color(0xFF333333)),
+                                              children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'Mais',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(text: ' recentes')
+                                          ]))),
+                                if (filteredRecipes != null &&
+                                    filteredRecipes.length > 0)
+                                  for (var recipe in filteredRecipes)
+                                    RecipeCard(
+                                      recipe: recipe,
+                                      selected: selectedRecipe == recipe
+                                          ? true
+                                          : false,
+                                      onSelected: () {
+                                        setState(() {
+                                          selectedRecipe = recipe;
+                                          showRecipeModal(context, recipe);
+                                        });
+                                      },
+                                    )
+                                else
+                                  Container(
+                                    padding: EdgeInsets.all(30),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.list_alt,
+                                          color: Color(0xFF7B7B7B),
+                                          size: 80,
+                                        ),
+                                        SizedBox(height: 9),
+                                        Text(
+                                          "Nenhuma receita encontrada",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 24,
+                                              color: Color(0xFF333333),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(height: 9),
+                                        Text(
+                                          "Castre uma receita ou realize uma nova busca",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Color(0xFF969696),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )
+                              ],
+                            ),
+                          ),
+                        ),
+                ),
+              ],
+            )));
   }
 }

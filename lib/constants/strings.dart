@@ -1,3 +1,3 @@
 class Strings {
-  static String baseURL = "'http://localhost:4101'";
+  static String baseURL = "http://localhost:4101";
 }

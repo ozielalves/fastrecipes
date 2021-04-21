@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "666667552639",
+    "firebase_url": "https://fast-recipes-oz-default-rtdb.firebaseio.com",
+    "project_id": "fast-recipes-oz",
+    "storage_bucket": "fast-recipes-oz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666667552639:android:cef20df1ac4b8c65eb544a",
+        "android_client_info": {
+          "package_name": "com.example.fastrecipes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "666667552639-is12n206q3vvnviv1me7bmntssiuvoca.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fastrecipes",
+            "certificate_hash": "3187fb2f656aa69648a3821031723c308d0e6f6a"
+          }
+        },
+        {
+          "client_id": "666667552639-feheii3gq9vcqmul07n17d9pfcgk1m1f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsz4KJ79vx9ZMuodLzKXwGRrTpzPeWqjo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "666667552639-feheii3gq9vcqmul07n17d9pfcgk1m1f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

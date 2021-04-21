@@ -1,28 +1,4 @@
 import 'dart:convert';
-
-Food foodFromJson(String str) => Food.fromJson(json.decode(str));
-
-String foodToJson(Food data) => json.encode(data.toJson());
-
-class Food {
-  Food({
-    this.id,  
-    this.name,
-  });
-
-  int id;
-  String name;
-
-  factory Food.fromJson(Map<String, dynamic> json) => Food(
-        id: json["id"],
-        name: json["name"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-      };
-}
 // To parse this JSON data, do
 //
 //     final recipe = recipeFromJson(jsonString);
@@ -33,6 +9,7 @@ String recipeToJson(Recipe data) => json.encode(data.toJson());
 
 class Recipe {
   Recipe({
+    this.key,
     this.creatorName,
     this.name,
     this.preparationTime,
@@ -41,6 +18,7 @@ class Recipe {
     this.ingredients,
   });
 
+  String key;
   String creatorName;
   String name;
   String preparationTime;
@@ -48,14 +26,15 @@ class Recipe {
   String dificultyLevel;
   List<Ingredient> ingredients;
 
-  factory Recipe.fromJson(Map<String, dynamic> json) => Recipe(
-        creatorName: json["creatorName"],
-        name: json["name"],
-        preparationTime: json["preparationTime"],
-        preparation: json["preparation"],
-        dificultyLevel: json["dificultyLevel"],
+  factory Recipe.fromJson(MapEntry<dynamic, dynamic> json) => Recipe(
+        key: json.key,
+        creatorName: json.value["creatorName"],
+        name: json.value["name"],
+        preparationTime: json.value["preparationTime"],
+        preparation: json.value["preparation"],
+        dificultyLevel: json.value["dificultyLevel"],
         ingredients: List<Ingredient>.from(
-            json["ingredients"].map((x) => Ingredient.fromJson(x))),
+            json.value["ingredients"].map((x) => Ingredient.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {

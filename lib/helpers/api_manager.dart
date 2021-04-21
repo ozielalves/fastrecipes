@@ -1,4 +1,4 @@
-import 'package:fastrecipes/models/recipe.dart';
+/* import 'package:fastrecipes/models/recipe.dart';
 import 'package:fastrecipes/constants/strings.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -9,7 +9,7 @@ class ApiManager {
     var recipe;
 
     try {
-      var response = await client.post("${Strings.baseURL}/recipe/register",
+      var response = await client.post(Uri.parse("${Strings.baseURL}/recipe/register"),
           body: r.toJson());
       if (response.statusCode == 200) {
         var jsonString = response.body;
@@ -28,7 +28,7 @@ class ApiManager {
     var recipes;
 
     try {
-      var response = await client.post("${Strings.baseURL}/recipe/register");
+      var response = await client.post(Uri.parse("${Strings.baseURL}/recipe/register"));
       if (response.statusCode == 200) {
         var jsonString = response.body;
         var jsonMap = jsonDecode(jsonString);
@@ -47,7 +47,7 @@ class ApiManager {
 
     try {
       var response =
-          await client.post("${Strings.baseURL}food/register?name=$foodName");
+          await client.post(Uri.parse("${Strings.baseURL}food/register?name=$foodName"));
       if (response.statusCode == 200) {
         var jsonString = response.body;
         var jsonMap = jsonDecode(jsonString);
@@ -60,4 +60,30 @@ class ApiManager {
     }
     return food;
   }
+}
+ */
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:fastrecipes/core/theme/app_colors.dart';
+
+void checkAuth({BuildContext context, FirebaseAuth auth, dynamic route}) async {
+  auth.authStateChanges().listen((user) {
+    if (user != null) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => route));
+    }
+  });
+}
+
+void showError({BuildContext context, String errorMessage}) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    backgroundColor: AppColors.errorColor,
+    behavior: SnackBarBehavior.floating,
+    content:
+        Text(errorMessage, style: TextStyle(color: AppColors.textButtonColor)),
+    action: SnackBarAction(
+      label: 'Limpar',
+      textColor: AppColors.textButtonColor,
+      onPressed: () {},
+    ),
+  ));
 }

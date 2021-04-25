@@ -1,14 +1,33 @@
+import 'package:fastrecipes/core/theme/app_colors.dart';
 import 'package:fastrecipes/core/theme/app_icons.dart';
 import 'package:fastrecipes/models/recipe.dart';
+import 'package:fastrecipes/models/user.dart';
+import 'package:fastrecipes/providers/api_%20fastrecipe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class RecipeCard extends StatelessWidget {
+  final ApiManager _apiManager = ApiManager();
   final Recipe recipe;
   final bool selected;
   final Function onSelected;
+  final bool isFavorite;
+  final IUser userLoggedIn;
+  final Function updateUser;
 
-  RecipeCard({this.recipe, this.selected, this.onSelected});
+  RecipeCard(
+      {Key key,
+      @required this.recipe,
+      @required this.selected,
+      @required this.onSelected,
+      @required this.userLoggedIn,
+      this.isFavorite,
+      @required this.updateUser})
+      : super(key: key);
+
+  Future<void> _toggleFavorite() async {
+    await _apiManager.toggleRecipeLove(userLoggedIn.key, recipe.key);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +40,7 @@ class RecipeCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
             border: selected
-                ? Border.all(width: 1.5, color: Color(0xFF7B7B7B))
+                ? Border.all(width: 1.5, color: AppColors.borderColor)
                 : null),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -51,8 +70,6 @@ class RecipeCard extends StatelessWidget {
                               color: Color(0xFF6B6B6B))),
                     ],
                   ),
-
-                  /* SizedBox(height: 22), */
                   Container(
                     margin: EdgeInsets.only(top: 15),
                     child: Row(
@@ -80,8 +97,9 @@ class RecipeCard extends StatelessWidget {
               ),
             ),
             FavoriteButton(
-              active: false,
-              onTap: () {},
+              active: userLoggedIn.favoriteRecipesKeys.contains(recipe.key),
+              onTap: _toggleFavorite,
+              updateUser: updateUser,
             ),
           ],
         ),
@@ -93,8 +111,13 @@ class RecipeCard extends StatelessWidget {
 class FavoriteButton extends StatefulWidget {
   final bool active;
   final Function onTap;
+  final Function updateUser;
 
-  FavoriteButton({Key key, @required this.active, @required this.onTap})
+  FavoriteButton(
+      {Key key,
+      @required this.active,
+      @required this.onTap,
+      @required this.updateUser})
       : super(key: key);
 
   @override
@@ -111,11 +134,12 @@ class _FavoriteButtonState extends State<FavoriteButton> {
   }
 
   _toggleActivity() async {
-    await widget.onTap();
-    //Tratar caso não dê certo
     setState(() {
       active = !active;
     });
+    await widget.onTap();
+    await widget.updateUser();
+    //Tratar caso não dê certo
   }
 
   @override

@@ -7,7 +7,7 @@ class ActionButton extends StatelessWidget {
   final Color buttonColor;
   final VoidCallback action;
   final bool outlined;
-  final IconData icon;
+  final Widget icon;
   final SvgPicture svgIcon;
   final double iconSize;
   final Color iconColor;
@@ -37,11 +37,7 @@ class ActionButton extends StatelessWidget {
       elevation: outlined ? 0 : 2.0,
       fillColor: outlined ? Colors.transparent : buttonColor,
       child: icon != null
-          ? Icon(
-              icon,
-              size: iconSize,
-              color: iconColor,
-            )
+          ? icon
           : svgIcon != null && text != null
               ? Row(
                   mainAxisAlignment: MainAxisAlignment.center,

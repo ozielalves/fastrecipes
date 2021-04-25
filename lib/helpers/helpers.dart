@@ -76,13 +76,13 @@ void checkAuth({BuildContext context, FirebaseAuth auth, dynamic route}) async {
 
 void showError({BuildContext context, String errorMessage}) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    margin: EdgeInsets.fromLTRB(10.0, 0, 10.0, 77.0),
     backgroundColor: AppColors.errorColor,
     behavior: SnackBarBehavior.floating,
-    content:
-        Text(errorMessage, style: TextStyle(color: AppColors.textButtonColor)),
+    content: Text(errorMessage, style: TextStyle(color: AppColors.white)),
     action: SnackBarAction(
       label: 'Limpar',
-      textColor: AppColors.textButtonColor,
+      textColor: AppColors.white,
       onPressed: () {},
     ),
   ));

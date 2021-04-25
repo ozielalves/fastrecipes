@@ -1,11 +1,8 @@
-import 'package:fastrecipes/core/theme/app_colors.dart';
 import 'package:fastrecipes/models/recipe.dart';
-import 'package:fastrecipes/views/content/components/recipe_card.dart';
-import 'package:fastrecipes/views/content/components/recipe_modal.dart';
-import 'package:fastrecipes/views/content/components/widgets.dart';
+import 'package:fastrecipes/models/user.dart';
 import 'package:flutter/material.dart';
 
-import 'empty_state.dart';
+import 'list_content_component.dart';
 import 'tabbar_component.dart';
 
 class HomeContentComponent extends StatefulWidget {
@@ -13,13 +10,19 @@ class HomeContentComponent extends StatefulWidget {
   final List<Recipe> recipes;
   final Recipe selectedRecipe;
   final bool isRecipesRequestLoading;
+  final IUser userLoggedIn;
+  final Function updateUser;
+  final Function updateRecipesList;
 
   const HomeContentComponent(
       {Key key,
       @required this.isLoggedIn,
       this.recipes,
       this.selectedRecipe,
-      this.isRecipesRequestLoading})
+      this.isRecipesRequestLoading,
+      @required this.userLoggedIn,
+      @required this.updateUser,
+      @required this.updateRecipesList})
       : super(key: key);
 
   @override
@@ -29,7 +32,6 @@ class HomeContentComponent extends StatefulWidget {
 class _HomeContentComponentState extends State<HomeContentComponent>
     with SingleTickerProviderStateMixin {
   Recipe selectedRecipe;
-
   // Controllers
   TabController tabController;
 
@@ -40,85 +42,59 @@ class _HomeContentComponentState extends State<HomeContentComponent>
     super.initState();
   }
 
+  List<Recipe> _getFavoriteRecipes() {
+    if (widget.userLoggedIn != null) {
+      return widget.recipes
+          .where(
+              (e) => widget.userLoggedIn?.favoriteRecipesKeys?.contains(e.key))
+          .toList();
+    } else {
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Column(
-        children: [
-          AppBarContent(
-            tabController: tabController,
-            onTap: (index) {},
-          ),
-          !widget.isLoggedIn
-              ? Expanded(
-                  child: Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: AppColors.primaryColor,
-                    ),
-                  ),
-                )
-              : Expanded(
-                  child: widget.isRecipesRequestLoading
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            backgroundColor: AppColors.primaryColor,
-                          ),
-                        )
-                      : ShaderMask(
-                          shaderCallback: (Rect rect) {
-                            return LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.black,
-                                Colors.transparent,
-                                Colors.transparent,
-                                Colors.black
-                              ],
-                              stops: [
-                                0.0,
-                                0.05,
-                                1.0,
-                                1.0
-                              ], // 10% purple, 80% transparent, 10% purple
-                            ).createShader(rect);
-                          },
-                          blendMode: BlendMode.dstOut,
-                          child: ScrollConfiguration(
-                            behavior: NoGlowBehaviour(),
-                            child: ListView(
-                              children: <Widget>[
-                                if (widget.recipes != null &&
-                                    widget.recipes.length > 0)
-                                  for (var recipe in widget.recipes)
-                                    RecipeCard(
-                                      recipe: recipe,
-                                      selected: selectedRecipe == recipe
-                                          ? true
-                                          : false,
-                                      onSelected: () {
-                                        setState(() {
-                                          selectedRecipe = recipe;
-                                        });
-                                        showRecipeModal(context, recipe);
-                                      },
-                                    )
-                                else
-                                  EmptyState(
-                                      icon: Icon(
-                                        Icons.list_alt,
-                                        color: AppColors.emptyStateIconColor,
-                                        size: 80,
-                                      ),
-                                      title: "Nenhuma receita encontrada",
-                                      description:
-                                          "Castre uma receita ou realize uma nova busca"),
-                              ],
-                            ),
-                          ),
-                        ),
+      child: DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            AppBarContent(),
+            Expanded(
+              child: TabBarView(children: [
+                ListContentComponent(
+                  isLoggedIn: widget.isLoggedIn,
+                  isRecipesRequestLoading: widget.isRecipesRequestLoading,
+                  recipes: widget.recipes,
+                  selectedRecipe: selectedRecipe,
+                  setSelectedRecipe: (recipe) {
+                    setState(() {
+                      selectedRecipe = recipe;
+                    });
+                  },
+                  userLoggedIn: widget.userLoggedIn,
+                  updateUser: widget.updateUser,
+                  updateRecipesList: widget.updateRecipesList,
                 ),
-        ],
+                ListContentComponent(
+                  isLoggedIn: widget.isLoggedIn,
+                  isRecipesRequestLoading: widget.isRecipesRequestLoading,
+                  recipes: _getFavoriteRecipes(),
+                  selectedRecipe: selectedRecipe,
+                  setSelectedRecipe: (recipe) {
+                    setState(() {
+                      selectedRecipe = recipe;
+                    });
+                  },
+                  userLoggedIn: widget.userLoggedIn,
+                  updateUser: widget.updateUser,
+                  updateRecipesList: widget.updateRecipesList,
+                ),
+              ]),
+            ),
+          ],
+        ),
       ),
     );
   }

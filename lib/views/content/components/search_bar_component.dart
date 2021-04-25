@@ -15,7 +15,7 @@ class SearchBarComponent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: AppColors.textButtonColor,
+          color: AppColors.white,
           boxShadow: kElevationToShadow[3],
           borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(30),
@@ -29,9 +29,12 @@ class SearchBarComponent extends StatelessWidget {
               children: [
                 Input(
                   controller: searchController,
-                  borderRadius: 10.0,
+                  type: TextInputType.text,
+                  borderRadius: 20.0,
                   label: 'O que tem na sua geladeira?',
                   labelFontSize: 18,
+                  fillColor: AppColors.lightGrey,
+                  labelColor: Color(0xFFB2B2B2),
                   floatingLabelBehavior: FloatingLabelBehavior.never,
                   icon: Icon(
                     Icons.search,

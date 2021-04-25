@@ -6,9 +6,10 @@ class AppColors {
   static Color white = Color(0xFFFFFFFF);
   static Color backgroundColor = Color(0xFFEDEDED);
   static Color textColor = Color(0xFF333333);
-  static Color textFadedColor = Color(0xFF9C9C9C);
-  static Color textButtonColor = Color(0xFFFFFFFF);
+  static Color lightGrey = Color(0xFFEDEDED);
+  static Color grey = Color(0xFF9C9C9C);
   static Color successColor = Color(0xFF56C568);
   static Color errorColor = Color(0xFFEB5757);
-  static Color emptyStateIconColor = Color(0xFF7B7B7B);
+  static Color darkGrey = Color(0xFF7B7B7B);
+  static Color borderColor = Color(0xFF979797);
 }

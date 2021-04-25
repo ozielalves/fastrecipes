@@ -50,7 +50,7 @@ class LandingPage extends StatelessWidget {
                 margin: EdgeInsets.fromLTRB(80, 0, 80, 62.0),
                 child: ActionButton(
                     text: 'Quero começar',
-                    textColor: AppColors.textButtonColor,
+                    textColor: AppColors.white,
                     buttonColor: Theme.of(context).primaryColor,
                     minWidth: double.maxFinite,
                     action: () {

@@ -1,26 +1,24 @@
 import 'package:fastrecipes/core/theme/app_colors.dart';
 import 'package:fastrecipes/core/theme/app_icons.dart';
 import 'package:fastrecipes/models/recipe.dart';
+import 'package:fastrecipes/models/user.dart';
 import 'package:fastrecipes/views/content/components/search_content_component.dart';
-import 'package:fastrecipes/views/landing_page.dart';
+import 'package:fastrecipes/views/content/landing_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fastrecipes/providers/api_%20fastrecipe.dart';
 import 'package:flutter/services.dart';
-import '../recipe_register.dart';
+import './recipe_register.dart';
 import 'components/bottom_navigator_component.dart';
 import 'components/home_content_component.dart';
+import 'components/profile_content_component.dart';
 
 class Recipes extends StatefulWidget {
-  final String userKey;
-
-  Recipes({this.userKey});
-
   @override
   _RecipesState createState() => _RecipesState();
 }
 
-class _RecipesState extends State<Recipes> with SingleTickerProviderStateMixin {
+class _RecipesState extends State<Recipes> {
   ApiManager apiManager = ApiManager();
   FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -29,20 +27,20 @@ class _RecipesState extends State<Recipes> with SingleTickerProviderStateMixin {
   Recipe selectedRecipe;
   bool isRecipesRequestLoading = false;
   User user;
+  IUser userLoggedIn;
   bool isLoggedIn = false;
+  int _previousTabIndex = 0;
   int _currentTabIndex = 0;
   int _currentContentViewIndex = 0;
 
   // Controllers
   TextEditingController searchController = TextEditingController();
-  TabController tabController;
 
   @override
   void initState() {
-    updateList();
+    updateRecipesList();
     _getUser();
     _checkAuth();
-    tabController = TabController(length: 2, vsync: this);
     super.initState();
     /* checkAuth(context: context, auth: _auth, route: HomePage()); */
   }
@@ -58,18 +56,25 @@ class _RecipesState extends State<Recipes> with SingleTickerProviderStateMixin {
 
   void _getUser() async {
     User firebaseUser = _auth.currentUser;
-    print(firebaseUser);
+
     await firebaseUser.reload();
     firebaseUser = _auth.currentUser;
 
-    print(firebaseUser);
-
     if (firebaseUser != null) {
+      var userByEmail = await apiManager.getUserByEmail(firebaseUser.email);
       setState(() {
         this.user = firebaseUser;
         this.isLoggedIn = true;
+        this.userLoggedIn = userByEmail;
       });
     }
+  }
+
+  Future<void> updateUser() async {
+    IUser updatedUser = await apiManager.getUserByKey(userLoggedIn.key);
+    setState(() {
+      userLoggedIn = updatedUser;
+    });
   }
 
   void _setRecipesRequestLoading(bool value) {
@@ -78,7 +83,7 @@ class _RecipesState extends State<Recipes> with SingleTickerProviderStateMixin {
     });
   }
 
-  Future<void> updateList() async {
+  Future<void> updateRecipesList() async {
     _setRecipesRequestLoading(true);
     await apiManager.getRecipes().then((list) {
       setState(() {
@@ -105,14 +110,26 @@ class _RecipesState extends State<Recipes> with SingleTickerProviderStateMixin {
                     isRecipesRequestLoading: isRecipesRequestLoading,
                     recipes: recipes,
                     selectedRecipe: selectedRecipe,
+                    userLoggedIn: userLoggedIn,
+                    updateUser: () async => await updateUser(),
+                    updateRecipesList: () async => await updateRecipesList(),
                   ),
                 if (_currentContentViewIndex == 1)
                   SearchContentComponent(
-                      recipes: recipes,
-                      isRecipesRequestLoading: isRecipesRequestLoading),
+                    recipes: recipes,
+                    isRecipesRequestLoading: isRecipesRequestLoading,
+                    userLoggedIn: userLoggedIn,
+                    updateUser: () async => await updateUser(),
+                  ),
+                if (_currentContentViewIndex == 2)
+                  ProfileContentComponent(
+                    userLoggedIn: userLoggedIn,
+                    updateUser: () async => await updateUser(),
+                  ),
                 BottomNavigatorComponent(
                   onTap: (index) {
                     setState(() {
+                      _previousTabIndex = _currentTabIndex;
                       _currentTabIndex = index;
                     });
                   },
@@ -142,16 +159,27 @@ class _RecipesState extends State<Recipes> with SingleTickerProviderStateMixin {
                         activeIcon: AppIcons.addFilled,
                         icon: AppIcons.addStroked,
                         isActive: false,
-                        goTo: () =>
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => RecipeRegister(
-                                      userKey: this.widget.userKey,
-                                    )))),
+                        goTo: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => RecipeRegister(
+                                    userLoggedIn: userLoggedIn,
+                                  )));
+                          setState(() {
+                            _currentTabIndex = _previousTabIndex;
+                          });
+                        }),
                     BottomNavigatorItemComponent(
-                      label: "Perfil",
-                      activeIcon: AppIcons.personFilled,
-                      icon: AppIcons.personStroked,
-                    ),
+                        label: "Perfil",
+                        activeIcon: AppIcons.personFilled,
+                        icon: AppIcons.personStroked,
+                        goTo: () {
+                          setState(() {
+                            _currentContentViewIndex = 2;
+                          });
+                        } /* () async => await apiManager.updateUser(
+                          userLoggedIn: userLoggedIn,
+                          changes: {"name": 'Oziel', "lastname": 'Alves'}), */
+                        ),
                   ],
                 )
               ],

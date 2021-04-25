@@ -1,4 +1,3 @@
-import 'package:fastrecipes/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -22,6 +21,16 @@ class AppIcons {
   static const searchFilled = "${pathIcons}SearchFilledIcon.svg";
   static const searchStroked = "${pathIcons}SearchStrokedIcon.svg";
   static const time = "${pathIcons}TimeIcon.svg";
+  static const carrotFilledOutlined = "${pathIcons}CarrotFilledOutlined.svg";
+  static const easyDificultyOutlined = "${pathIcons}EasyDificultyOutlined.svg";
+  static const hardDificultyOutlined = "${pathIcons}HardDificultyOutlined.svg";
+  static const mediumDificultyOutlined =
+      "${pathIcons}MediumDificultyOutlined.svg";
+  static const personFilledOutlined = "${pathIcons}PersonFilledOutlined.svg";
+  static const timeFilledOutlined = "${pathIcons}TimeFilledOutlined.svg";
+  static const recipePreparationOutlined =
+      "${pathIcons}RecipePreparationOutlined.svg";
+  static const heartEmptyStateIcon = "${pathIcons}HeartEmptyStateIcon.svg";
 }
 
 class AppIcon extends StatelessWidget {

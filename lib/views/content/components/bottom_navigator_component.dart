@@ -53,9 +53,7 @@ class BottomNavigatorItemComponent extends StatelessWidget {
               style: TextStyle(
                   fontSize: 10,
                   fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                  color: isActive
-                      ? AppColors.primaryColor
-                      : AppColors.textFadedColor),
+                  color: isActive ? AppColors.primaryColor : AppColors.grey),
             )
           ],
         ),
@@ -82,8 +80,7 @@ class BottomNavigatorComponent extends StatelessWidget {
       height: 67.0,
       decoration: BoxDecoration(
           color: AppColors.white,
-          border: Border(
-              top: BorderSide(color: AppColors.textFadedColor, width: 1.0))),
+          border: Border(top: BorderSide(color: AppColors.grey, width: 1.0))),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -96,7 +93,7 @@ class BottomNavigatorComponent extends StatelessWidget {
                       isActive: items.indexOf(e) == currentIndex,
                       onTap: () {
                         onTap(items.indexOf(e));
-                        e.goTo != null && e.goTo();
+                        e.goTo();
                       }))
                   .toList(),
             ),

@@ -2,7 +2,7 @@ import 'package:fastrecipes/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class EmptyState extends StatelessWidget {
-  final Icon icon;
+  final Widget icon;
   final String title;
   final String description;
 
@@ -29,7 +29,7 @@ class EmptyState extends StatelessWidget {
           Text(
             description,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18, color: AppColors.textFadedColor),
+            style: TextStyle(fontSize: 18, color: AppColors.grey),
           )
         ],
       ),

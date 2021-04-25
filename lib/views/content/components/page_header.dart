@@ -17,7 +17,11 @@ class PageHeader extends StatelessWidget {
       children: [
         ActionButton(
           action: onGoBack,
-          icon: Icons.arrow_back,
+          icon: Icon(
+            Icons.arrow_back,
+            size: 30,
+            color: AppColors.primaryColor,
+          ),
           iconColor: AppColors.primaryColor,
           minWidth: double.minPositive,
           buttonColor: Colors.transparent,
@@ -28,10 +32,10 @@ class PageHeader extends StatelessWidget {
         if (signOut == null) Spacer(),
         Text(title,
             style: TextStyle(
-                fontSize: 30.0,
+                fontSize: 22.0,
                 fontWeight: FontWeight.w600,
                 fontStyle: FontStyle.normal,
-                color: AppColors.primaryColor)),
+                color: AppColors.textColor)),
         signOut != null
             ? signOut
             : Spacer(

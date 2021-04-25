@@ -7,12 +7,7 @@ import 'package:flutter/material.dart';
 import 'action_button.dart';
 
 class AppBarContent extends StatelessWidget {
-  final TabController tabController;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final Function(int) onTap;
-
-  AppBarContent({Key key, @required this.tabController, @required this.onTap})
-      : super(key: key);
 
   void _singOut() {
     _auth.signOut();
@@ -30,14 +25,12 @@ class AppBarContent extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.only(right: (width / 2.7) - 20),
               child: TabBar(
-                controller: tabController,
-                onTap: onTap,
                 labelStyle: AppTyphography.bodyText(context),
                 labelPadding: EdgeInsets.zero,
                 indicatorPadding: EdgeInsets.zero,
                 overlayColor: MaterialStateProperty.all(Colors.transparent),
                 labelColor: AppColors.textColor,
-                unselectedLabelColor: AppColors.textFadedColor,
+                unselectedLabelColor: AppColors.grey,
                 indicatorColor: AppColors.primaryColor,
                 indicatorWeight: 3,
                 tabs: [
@@ -72,7 +65,11 @@ class AppBarContent extends StatelessWidget {
                     },
                   );
                 }),
-            icon: Icons.exit_to_app,
+            icon: Icon(
+              Icons.exit_to_app,
+              size: 30,
+              color: AppColors.primaryColor,
+            ),
             iconColor: AppColors.primaryColor,
             minWidth: double.minPositive,
             buttonColor: Colors.transparent,

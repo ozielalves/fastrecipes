@@ -1,5 +1,6 @@
 import 'package:fastrecipes/core/theme/app_colors.dart';
-import 'package:fastrecipes/views/login.dart';
+import 'package:fastrecipes/views/content/login.dart';
+import 'package:fastrecipes/views/content/splash_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fastrecipes/providers/google_sign_in.dart';
@@ -16,9 +17,8 @@ class AuthPageProvider extends StatelessWidget {
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, snapshot) {
               final provider = Provider.of<GoogleSignInProvider>(context);
-
               if (provider.isSigningIn) {
-                return buildLoading();
+                return SplashPage(); /* buildLoading(); */
               } else if (snapshot.hasData) {
                 return Recipes();
               } else {

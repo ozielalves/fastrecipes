@@ -1,5 +1,5 @@
 import 'package:fastrecipes/models/recipe.dart';
-import 'package:fastrecipes/core/app_strings.dart';
+import 'package:fastrecipes/core/app_endpoints.dart';
 import 'package:fastrecipes/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -10,7 +10,7 @@ class ApiManager {
     var registeredUserKey;
     try {
       final response = await client.post(
-          Uri.parse("${Strings.baseURL}/user.json"),
+          Uri.parse("${Endpoint.baseURL}/user.json"),
           body: jsonEncode(u.toJson()));
       if (response.statusCode == 200) {
         final jsonString = response.body;
@@ -27,26 +27,27 @@ class ApiManager {
     return registeredUserKey;
   }
 
-  Future<dynamic> addFavoriteRecipe(String userId, String recipeKey) async {
+  Future<Object> updateUser({String userKey, Object changes}) async {
     var client = http.Client();
-    var registeredUser;
+    var persistedChanges;
+
     try {
       final response = await client.patch(
-          Uri.parse("${Strings.baseURL}/user.json"),
-          body: {"$userId/favoriteRecipes": []});
+          Uri.parse("${Endpoint.baseURL}/user/$userKey.json"),
+          body: jsonEncode(changes));
       if (response.statusCode == 200) {
         final jsonString = response.body;
         final jsonMap = jsonDecode(jsonString);
 
-        registeredUser = jsonMap;
+        persistedChanges = jsonMap;
       }
     } catch (Exception) {
-      print('Não foi possível adcionar a receita favorita');
+      print('Não foi possível editar o usuário');
       return null;
     } finally {
       client.close();
     }
-    return registeredUser;
+    return persistedChanges;
   }
 
   Future<dynamic> getUserKeyByEmail(String email) async {
@@ -54,14 +55,13 @@ class ApiManager {
     var userKey;
     try {
       final response =
-          await client.get(Uri.parse('${Strings.baseURL}/user.json'));
+          await client.get(Uri.parse('${Endpoint.baseURL}/user.json'));
       if (response.statusCode == 200) {
         final jsonString = response.body;
         final jsonMap = jsonDecode(jsonString);
 
         userKey = jsonMap.keys.firstWhere((k) => jsonMap[k]['email'] == email,
             orElse: () => null);
-        print(userKey);
       }
     } catch (Exception) {
       print('Não foi possível recuperar o usuário de e-mail $email');
@@ -72,18 +72,40 @@ class ApiManager {
     return userKey;
   }
 
-  Future<IUser> getUserByKey(String key) async {
+  Future<dynamic> getUserByEmail(String email) async {
     var client = http.Client();
-    var user;
+    IUser userLoggedIn;
+
     try {
       final response =
-          await client.get(Uri.parse('${Strings.baseURL}/user/$key.json'));
+          await client.get(Uri.parse('${Endpoint.baseURL}/user.json'));
+      if (response.statusCode == 200) {
+        final jsonString = response.body;
+        Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+        List<IUser> users =
+            jsonMap.entries.map((e) => IUser.fromJsonEntry(e)).toList();
+        userLoggedIn = users.where((u) => u.email == email).first;
+      }
+    } catch (Exception) {
+      print(Exception);
+      print('Não foi possível recuperar o usuário de e-mail $email');
+      return null;
+    } finally {
+      client.close();
+    }
+    return userLoggedIn;
+  }
+
+  Future<IUser> getUserByKey(String key) async {
+    var client = http.Client();
+    IUser user;
+    try {
+      final response =
+          await client.get(Uri.parse('${Endpoint.baseURL}/user/$key.json'));
       if (response.statusCode == 200) {
         final jsonString = response.body;
         final jsonMap = jsonDecode(jsonString);
-
-        user = IUser.fromJson(jsonMap);
-        print(user);
+        user = IUser.fromKeyAndJson(key, jsonMap);
       }
     } catch (Exception) {
       print('Não foi possível recuperar o usuário pela chave');
@@ -94,13 +116,46 @@ class ApiManager {
     return user;
   }
 
+  Future<Object> toggleRecipeLove(String userKey, String recipeKey) async {
+    var client = http.Client();
+    IUser updatedUser;
+    var changes;
+    try {
+      updatedUser = await getUserByKey(userKey);
+      if (updatedUser != null) {
+        if (updatedUser.favoriteRecipesKeys.contains(recipeKey)) {
+          updatedUser.favoriteRecipesKeys.remove(recipeKey);
+        } else {
+          updatedUser.favoriteRecipesKeys.add(recipeKey);
+        }
+        print(updatedUser.favoriteRecipesKeys.toString());
+        final response = await client.patch(
+            Uri.parse("${Endpoint.baseURL}/user/$userKey.json"),
+            body: jsonEncode(
+                {"favoriteRecipesKeys": updatedUser.favoriteRecipesKeys}));
+        if (response.statusCode == 200) {
+          final jsonString = response.body;
+          final jsonMap = jsonDecode(jsonString);
+
+          changes = jsonMap;
+        }
+      }
+    } catch (Exception) {
+      print(Exception);
+      print('Não foi possível adcionar a receita favorita');
+      return null;
+    } finally {
+      client.close();
+    }
+    return changes;
+  }
+
   Future<String> addRecipe(Recipe r) async {
     var client = http.Client();
     var recipeId;
-    print(r.toJson());
     try {
       final response = await client.post(
-          Uri.parse("${Strings.baseURL}/recipe.json"),
+          Uri.parse("${Endpoint.baseURL}/recipe.json"),
           body: jsonEncode(r.toJson()));
       if (response.statusCode == 200) {
         final jsonString = response.body;
@@ -117,22 +172,40 @@ class ApiManager {
     return recipeId;
   }
 
-  /* Recipe _reviver(String key, value) {
-    if (key != null && value is Map && key.contains("-")) {
-      return new Recipe.fromJson(value);
-    }
-  } */
+  Future<Object> updateRecipe({String recipeKey, Object changes}) async {
+    var client = http.Client();
+    var persistedChanges;
 
-  List<Recipe> _recipesFromHashMap(Map jsonMap) {
-    List<Recipe> recipes;
-    for (var i = 0; i < jsonMap.length; i++) {
-      if (jsonMap[i].key != null &&
-          jsonMap[i].value is Map &&
-          jsonMap[i].key.contains("-")) {
-        print(jsonMap[i].value);
-        recipes.add(new Recipe.fromJson(jsonMap[i].value));
+    try {
+      final response = await client.patch(
+          Uri.parse("${Endpoint.baseURL}/user/$recipeKey.json"),
+          body: jsonEncode(changes));
+      if (response.statusCode == 200) {
+        final jsonString = response.body;
+        final jsonMap = jsonDecode(jsonString);
+
+        persistedChanges = jsonMap;
       }
-      return recipes;
+    } catch (Exception) {
+      print('Não foi possível editar a receita');
+      return null;
+    } finally {
+      client.close();
+    }
+    return persistedChanges;
+  }
+
+  Future<void> deleteRecipe(String recipeKey) async {
+    var client = http.Client();
+
+    try {
+      await client
+          .delete(Uri.parse("${Endpoint.baseURL}/recipe/$recipeKey.json"));
+    } catch (Exception) {
+      print('Não foi possível deletar a receita');
+      return null;
+    } finally {
+      client.close();
     }
   }
 
@@ -142,12 +215,11 @@ class ApiManager {
 
     try {
       var response =
-          await client.get(Uri.parse("${Strings.baseURL}/recipe.json"));
+          await client.get(Uri.parse("${Endpoint.baseURL}/recipe.json"));
       if (response.statusCode == 200) {
         var jsonString = response.body;
         Map<dynamic, dynamic> jsonMap = jsonDecode(jsonString);
         recipes = jsonMap.entries.map((e) => Recipe.fromJson(e)).toList();
-        print(recipes.toString());
       }
     } catch (Exception) {
       print('Não foi possível recuperar as receitas');
@@ -164,7 +236,7 @@ class ApiManager {
 
     try {
       var response = await client.post(
-          Uri.parse("${Strings.baseURL}/food.json"),
+          Uri.parse("${Endpoint.baseURL}/food.json"),
           body: jsonEncode({'name': foodName}));
       if (response.statusCode == 200) {
         var jsonString = response.body;
